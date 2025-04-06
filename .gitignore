@@ -1,9 +1,18 @@
+# Dependency folders
 node_modules/
-.wwebjs_auth/
 
-node_modules/
+# WhatsApp session/auth/cache
 .wwebjs_auth/
 .wwebjs_cache/
+
+# Environment files
 .env
-.DS_Store
+
+# Logs
 *.log
+
+# OS/System junk
+.DS_Store
+
+# Docker stuff (if you want to ignore build context)
+.dockerignore
