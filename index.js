@@ -3,6 +3,7 @@ const path = require("path");
 const qrcode = require("qrcode-terminal");
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const cron = require("node-cron");
+const express = require("express");
 const { handleReplies } = require("./replies/messages");
 require("dotenv").config();
 
@@ -44,7 +45,7 @@ client.on("ready", () => {
   const targetGroupId = "917805064405-1614323596@g.us";
 
   // 🔁 Weekly veggie duty message
-  const names = ["Nabhi-tiwariji", "Aman-Deep",  "Abhilash"];
+  const names = ["Nabhi-tiwariji", "Aman-Deep", "Abhilash"];
   cron.schedule("0 17 * * 1", async () => {
     const now = new Date();
     const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -84,4 +85,17 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-client.initialize();
+console.log("⏳ Waiting 3 seconds before launching WhatsApp client...");
+setTimeout(() => {
+  client.initialize();
+}, 3000);
+
+// ✅ Express server for Azure
+const app = express();
+const port = process.env.PORT || 3000;
+app.get("/", (req, res) => {
+  res.send("AutoBot 2.0 is alive! 🚀");
+});
+app.listen(port, () => {
+  console.log(`🌐 Web server running on http://localhost:${port}`);
+});
