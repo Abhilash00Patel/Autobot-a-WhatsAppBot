@@ -1,111 +1,57 @@
-const fs = require("fs");
-const path = require("path");
-const qrcode = require("qrcode-terminal");
-const { Client, LocalAuth } = require("whatsapp-web.js");
-const cron = require("node-cron");
-const express = require("express");
-const { handleReplies } = require("./replies/messages");
 require("dotenv").config();
+const express = require("express");
+const { Client, LocalAuth } = require("whatsapp-web.js");
+const qrcode = require("qrcode-terminal");
+const cron = require("node-cron");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-const authPath = path.join(__dirname, ".wwebjs_auth");
-if (!fs.existsSync(authPath)) {
-  console.warn("⚠️ Warning: .wwebjs_auth folder is missing! Login may not persist across restarts.");
-}
+const appOwnerNumber = "917805064405@c.us"; // 🔁 Your full WhatsApp ID here (like: 91XXXXXXXXXX@c.us)
 
-// Express server
 app.get("/", (req, res) => {
-  res.send("AutoBot 2.0 is alive! 🚀");
+  res.send("🚀 WhatsApp Bot is running!");
 });
-app.listen(port, () => {
-  console.log(`🌐 Web server running on http://localhost:${port}`);
-
-  // ✅ Start WhatsApp client after Express is fully running
-  setTimeout(() => {
-    try {
-      console.log("🚀 Launching WhatsApp client...");
-      client.initialize();
-    } catch (err) {
-      console.error("❌ Failed to initialize WhatsApp client:", err.message);
-    }
-  }, 3000); // You can increase this delay if needed
+app.listen(PORT, () => {
+  console.log(`🌐 Web server running on http://localhost:${PORT}`);
 });
-
-// Puppeteer + Client Setup
-const chromePath = process.env.CHROME_PATH || "/usr/bin/chromium";
 
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
-    executablePath: chromePath,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--single-process",
-      "--no-zygote",
-    ],
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
+    executablePath: process.env.CHROME_PATH || "/usr/bin/chromium",
   },
 });
 
 client.on("qr", (qr) => {
-  console.log("📲 Scan the QR code below:");
+  console.log("📱 Scan this QR code to log in:");
   qrcode.generate(qr, { small: true });
 });
 
 client.on("ready", async () => {
   console.log("✅ WhatsApp bot is ready to roll!");
 
-  const targetGroupId = "917805064405-1614323596@g.us";
-
-  // 🚨 Notify group on restart
   try {
-    await client.sendMessage(
-      targetGroupId,
-      `🔁 *AutoBot 2.0* ⚙️ restarted and is now active again! ~ Made by Arya`
-    );
+    await client.sendMessage(appOwnerNumber, "🔁 AutoBot 2.0 restarted and is now active!");
+    console.log("📩 Restart message sent to owner.");
   } catch (err) {
-    console.error("❌ Could not send restart notification:", err.message);
+    console.error("⚠️ Failed to send restart message:", err);
   }
-
-  // 🔁 Weekly veggie duty message
-  const names = ["Nabhi-tiwariji", "Aman-Deep", "Abhilash"];
-  cron.schedule("0 17 * * 1", async () => {
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const weekNumber = Math.floor((now - startOfYear) / (7 * 24 * 60 * 60 * 1000));
-    const selectedPerson = names[weekNumber % names.length];
-
-    const message = `🛒 This week's veggie shopper is: *${selectedPerson}* 🍅🥕 ~ *AutoBot 2.0* ⚙️ `;
-    try {
-      await client.sendMessage(targetGroupId, message);
-      console.log("✅ Weekly veggie duty sent!");
-    } catch (err) {
-      console.error("❌ Failed to send duty message:", err.message);
-    }
-  });
-
-  // Test message every 5 minutes
-  cron.schedule("*/5 * * * *", async () => {
-    try {
-      await client.sendMessage(targetGroupId, "⏰ Scheduled message test!");
-    } catch (err) {
-      console.error("❌ Scheduled test message failed:", err.message);
-    }
-  });
 });
 
-// Handle messages
-client.on("message", async (message) => {
-  if (message.fromMe) return;
-  await handleReplies(message);
+client.on("message", async (msg) => {
+  if (msg.body.toLowerCase() === "hi") {
+    msg.reply("AutoBot 2.0 ⚙️ is alive.");
+  }
 });
 
-// Graceful shutdown
-process.on("SIGINT", async () => {
-  console.log("👋 Bot shutting down...");
-  await client.destroy();
-  process.exit(0);
-});
+(async () => {
+  try {
+    console.log("🚀 Launching WhatsApp client...");
+    await client.initialize();
+  } catch (err) {
+    console.error("❌ Failed to initialize WhatsApp client:", err);
+  }
+})();

@@ -1,6 +1,6 @@
 FROM node:18
 
-# Install Chromium
+# Install Chromium and required dependencies
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-liberation \
@@ -19,11 +19,11 @@ RUN apt-get update && apt-get install -y \
     libxrandr2 \
     xdg-utils \
     --no-install-recommends && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV CHROME_PATH="/usr/bin/chromium"
-ENV PORT=3000
 
 WORKDIR /app
 
@@ -32,6 +32,7 @@ RUN npm install
 
 COPY . .
 
+# Confirm port used by express app
 EXPOSE 3000
 
-CMD ["node", "index.js"]
+CMD ["npm", "start"]
