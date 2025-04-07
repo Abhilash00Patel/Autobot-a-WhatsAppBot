@@ -7,17 +7,33 @@ const express = require("express");
 const { handleReplies } = require("./replies/messages");
 require("dotenv").config();
 
-// 🧹 Auto-delete Puppeteer SingletonLock file
-const lockPath = path.join(__dirname, ".wwebjs_auth", "session", "SingletonLock");
-if (fs.existsSync(lockPath)) {
-  try {
-    fs.unlinkSync(lockPath);
-    console.log("🧹 Removed stale SingletonLock file.");
-  } catch (err) {
-    console.error("⚠️ Failed to remove SingletonLock:", err.message);
-  }
+const app = express();
+const port = process.env.PORT || 3000;
+
+const authPath = path.join(__dirname, ".wwebjs_auth");
+if (!fs.existsSync(authPath)) {
+  console.warn("⚠️ Warning: .wwebjs_auth folder is missing! Login may not persist across restarts.");
 }
 
+// Express server
+app.get("/", (req, res) => {
+  res.send("AutoBot 2.0 is alive! 🚀");
+});
+app.listen(port, () => {
+  console.log(`🌐 Web server running on http://localhost:${port}`);
+
+  // ✅ Start WhatsApp client after Express is fully running
+  setTimeout(() => {
+    try {
+      console.log("🚀 Launching WhatsApp client...");
+      client.initialize();
+    } catch (err) {
+      console.error("❌ Failed to initialize WhatsApp client:", err.message);
+    }
+  }, 3000); // You can increase this delay if needed
+});
+
+// Puppeteer + Client Setup
 const chromePath = process.env.CHROME_PATH || "/usr/bin/chromium";
 
 const client = new Client({
@@ -39,10 +55,20 @@ client.on("qr", (qr) => {
   qrcode.generate(qr, { small: true });
 });
 
-client.on("ready", () => {
+client.on("ready", async () => {
   console.log("✅ WhatsApp bot is ready to roll!");
 
   const targetGroupId = "917805064405-1614323596@g.us";
+
+  // 🚨 Notify group on restart
+  try {
+    await client.sendMessage(
+      targetGroupId,
+      `🔁 *AutoBot 2.0* ⚙️ restarted and is now active again! ~ Made by Arya`
+    );
+  } catch (err) {
+    console.error("❌ Could not send restart notification:", err.message);
+  }
 
   // 🔁 Weekly veggie duty message
   const names = ["Nabhi-tiwariji", "Aman-Deep", "Abhilash"];
@@ -61,18 +87,17 @@ client.on("ready", () => {
     }
   });
 
-  // ⏱ Test every 5 mins
+  // Test message every 5 minutes
   cron.schedule("*/5 * * * *", async () => {
-    await client.sendMessage(targetGroupId, "⏰ Scheduled message test!");
+    try {
+      await client.sendMessage(targetGroupId, "⏰ Scheduled message test!");
+    } catch (err) {
+      console.error("❌ Scheduled test message failed:", err.message);
+    }
   });
-
-  // Bot live notification
-  client.sendMessage(
-    targetGroupId,
-    `Hi I'm *AutoBot 2.0* ⚙️  - *Made By Arya*     Now with added features`
-  );
 });
 
+// Handle messages
 client.on("message", async (message) => {
   if (message.fromMe) return;
   await handleReplies(message);
@@ -83,19 +108,4 @@ process.on("SIGINT", async () => {
   console.log("👋 Bot shutting down...");
   await client.destroy();
   process.exit(0);
-});
-
-console.log("⏳ Waiting 3 seconds before launching WhatsApp client...");
-setTimeout(() => {
-  client.initialize();
-}, 3000);
-
-// ✅ Express server for Azure
-const app = express();
-const port = process.env.PORT || 3000;
-app.get("/", (req, res) => {
-  res.send("AutoBot 2.0 is alive! 🚀");
-});
-app.listen(port, () => {
-  console.log(`🌐 Web server running on http://localhost:${port}`);
 });
