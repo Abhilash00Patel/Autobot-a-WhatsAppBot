@@ -39,5 +39,8 @@ COPY . .
 # Let Puppeteer know where Chromium is
 ENV CHROME_PATH=/usr/bin/chromium
 
+# 🔥 Tell Docker which port your app uses
+EXPOSE 3000
+
 # Run your bot
 CMD ["node", "index.js"]
