@@ -1,4 +1,5 @@
-FROM node:16
+# Use Node.js base image for the correct platform
+FROM --platform=linux/amd64 node:16
 
 # Install Chromium dependencies and clean up after installation
 RUN apt-get update --fix-missing && \
