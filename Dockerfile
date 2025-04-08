@@ -1,5 +1,4 @@
-# Use Node.js base image for the correct platform
-FROM --platform=linux/amd64 node:16
+FROM node:16
 
 # Install Chromium dependencies and clean up after installation
 RUN apt-get update --fix-missing && \
@@ -29,6 +28,9 @@ RUN apt-get update --fix-missing && \
 # Set environment variable for Puppeteer to locate Chromium
 ENV CHROME_PATH=/usr/bin/chromium
 
+# Set environment variable for Azure port
+ENV PORT=80
+
 # Set the working directory
 WORKDIR /app
 
@@ -39,10 +41,8 @@ RUN npm install
 # Copy the rest of your application code
 COPY . .
 
-# Expose the port your app will run on
-EXPOSE 3000
+# Expose port 80 (required by Azure App Service)
+EXPOSE 80
 
-# Start your app
+# Start the app
 CMD ["npm", "start"]
-
-
