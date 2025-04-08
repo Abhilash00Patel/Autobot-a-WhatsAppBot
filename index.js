@@ -11,6 +11,14 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const authPath = path.join(__dirname, ".wwebjs_auth");
+const lockFile = path.join(authPath, "session", "SingletonLock");
+
+// ✅ Patch to remove lock file if it exists (avoids crash)
+if (fs.existsSync(lockFile)) {
+  console.warn("⚠️ Found SingletonLock file. Deleting to prevent browser crash...");
+  fs.unlinkSync(lockFile);
+}
+
 if (!fs.existsSync(authPath)) {
   console.warn("⚠️ Warning: .wwebjs_auth folder is missing! Login may not persist across restarts.");
 }
@@ -30,7 +38,7 @@ app.listen(port, () => {
     } catch (err) {
       console.error("❌ Failed to initialize WhatsApp client:", err.message);
     }
-  }, 3000); // You can increase this delay if needed
+  }, 3000);
 });
 
 // Puppeteer + Client Setup

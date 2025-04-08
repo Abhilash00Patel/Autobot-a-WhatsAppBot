@@ -2,7 +2,7 @@ FROM node:18
 
 # Install Chromium and required dependencies
 RUN apt-get update && apt-get install -y \
-    chromium \
+    chromium-browser \
     fonts-liberation \
     libappindicator3-1 \
     libasound2 \
@@ -22,17 +22,21 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Puppeteer settings
 ENV PUPPETEER_SKIP_DOWNLOAD=true
-ENV CHROME_PATH="/usr/bin/chromium"
+ENV CHROME_PATH="/usr/bin/chromium-browser"
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci --omit=dev
 
 COPY . .
 
-# Confirm port used by express app
+# Healthcheck (optional)
+HEALTHCHECK --interval=30s --timeout=10s \
+    CMD curl -f http://localhost:3000/ || exit 1
+
 EXPOSE 3000
 
 CMD ["npm", "start"]
