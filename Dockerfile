@@ -1,6 +1,6 @@
 FROM node:18
 
-# Install Chromium and required dependencies
+# Install Chromium and dependencies
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-liberation \
@@ -18,17 +18,22 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    libgbm-dev \
+    libxshmfence-dev \
     --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Set environment variable for puppeteer to locate chromium
+ENV CHROME_PATH=/usr/bin/chromium
+
+# Working directory
 WORKDIR /app
 
-# Copy files
+# Copy files and install deps
 COPY package*.json ./
 RUN npm install
 COPY . .
 
-# Start the bot
-CMD ["node", "index.js"]
+# Start command
+CMD ["npm", "start"]
