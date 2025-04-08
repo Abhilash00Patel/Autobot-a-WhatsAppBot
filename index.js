@@ -8,7 +8,7 @@ const { handleReplies } = require("./replies/messages");
 require("dotenv").config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.WEBSITES_PORT || 3000;
 
 const authPath = path.join(__dirname, ".wwebjs_auth");
 const lockFile = path.join(authPath, "session", "SingletonLock");
