@@ -14,13 +14,17 @@ const authPath = path.join(__dirname, ".wwebjs_auth");
 const lockFile = path.join(authPath, "session", "SingletonLock");
 
 // ✅ Patch to remove lock file if it exists (avoids crash)
+// Only delete the SingletonLock file if it exists and is necessary to avoid crash
 if (fs.existsSync(lockFile)) {
   console.warn("⚠️ Found SingletonLock file. Deleting to prevent browser crash...");
   fs.unlinkSync(lockFile);
 }
 
+// Check if the session data exists in the authPath directory
 if (!fs.existsSync(authPath)) {
   console.warn("⚠️ Warning: .wwebjs_auth folder is missing! Login may not persist across restarts.");
+} else {
+  console.log("✅ Session data exists in .wwebjs_auth");
 }
 
 // Express server

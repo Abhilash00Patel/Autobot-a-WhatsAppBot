@@ -1,8 +1,9 @@
-FROM node:18
+FROM node:16
 
-# Install Chromium and dependencies
-RUN apt-get update && apt-get install -y \
-    chromium-browser \
+# Install Chromium dependencies
+RUN apt-get update --fix-missing
+RUN apt-get install -y \
+    chromium \
     fonts-liberation \
     libappindicator3-1 \
     libasound2 \
@@ -23,6 +24,9 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Continue with the rest of your Dockerfile
+
 
 # Set environment variable for puppeteer to locate chromium
 ENV CHROME_PATH=/usr/bin/chromium-browser
