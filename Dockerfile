@@ -2,7 +2,7 @@ FROM node:18
 
 # Install Chromium and dependencies
 RUN apt-get update && apt-get install -y \
-    chromium \
+    chromium-browser \
     fonts-liberation \
     libappindicator3-1 \
     libasound2 \
@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 # Set environment variable for puppeteer to locate chromium
-ENV CHROME_PATH=/usr/bin/chromium
+ENV CHROME_PATH=/usr/bin/chromium-browser
 
 # Working directory
 WORKDIR /app
@@ -34,6 +34,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
+# Expose the port your app will run on
+EXPOSE 3000
 
 # Start command
 CMD ["npm", "start"]
