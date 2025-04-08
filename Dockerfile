@@ -1,8 +1,8 @@
 FROM node:16
 
-# Install Chromium dependencies
-RUN apt-get update --fix-missing
-RUN apt-get install -y \
+# Install Chromium dependencies and clean up after installation
+RUN apt-get update --fix-missing && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
     chromium \
     fonts-liberation \
     libappindicator3-1 \
@@ -25,22 +25,21 @@ RUN apt-get install -y \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Continue with the rest of your Dockerfile
+# Set environment variable for Puppeteer to locate Chromium
+ENV CHROME_PATH=/usr/bin/chromium
 
-
-# Set environment variable for puppeteer to locate chromium
-ENV CHROME_PATH=/usr/bin/chromium-browser
-
-# Working directory
+# Set the working directory
 WORKDIR /app
 
-# Copy files and install deps
+# Copy package files and install Node.js dependencies
 COPY package*.json ./
 RUN npm install
+
+# Copy the rest of your application code
 COPY . .
 
 # Expose the port your app will run on
 EXPOSE 3000
 
-# Start command
+# Start your app
 CMD ["npm", "start"]
