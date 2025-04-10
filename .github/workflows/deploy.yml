@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -29,17 +28,15 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/whatsapp-bot:latest
           file: ./Dockerfile
-          platforms: linux/amd64 # ✅ Important fix
+          platforms: linux/amd64
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-
     steps:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: "whatsapp-bot-service"
           slot-name: "Production"
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: "${{ secrets.DOCKERHUB_USERNAME }}/whatsapp-bot:latest"
