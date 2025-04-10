@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:16
+FROM node:16
 
 # Install Chromium dependencies and clean up after installation
 RUN apt-get update --fix-missing && \
