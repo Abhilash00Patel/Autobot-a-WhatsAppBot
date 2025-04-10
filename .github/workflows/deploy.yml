@@ -39,4 +39,4 @@ jobs:
         with:
           app-name: "whatsapp-bot-service"
           slot-name: "Production"
-          images: "${{ secrets.DOCKERHUB_USERNAME }}/whatsapp-bot:latesm"
+          images: "${{ secrets.DOCKERHUB_USERNAME }}/whatsapp-bot:latest"
