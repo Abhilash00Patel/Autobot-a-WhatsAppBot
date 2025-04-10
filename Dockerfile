@@ -33,7 +33,7 @@ ENV CHROME_PATH=/usr/bin/chromium
 ENV PORT=3000
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /home/site/wwwroot
 
 # Copy package files and install Node.js dependencies
 COPY package*.json ./
