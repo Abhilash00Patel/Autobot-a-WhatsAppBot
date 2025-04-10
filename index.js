@@ -19,7 +19,7 @@ if (fs.existsSync(lockFile)) {
   console.warn("⚠️ Found SingletonLock file. Deleting to prevent browser crash...");
   fs.unlinkSync(lockFile);
 }
-
+//nice
 // Check for session folder
 if (!fs.existsSync(authPath)) {
   console.warn("⚠️ Warning: .wwebjs_auth folder is missing! Login may not persist across restarts.");
