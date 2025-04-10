@@ -1,4 +1,5 @@
 const fs = require("fs");
+fs.writeFileSync("server-log.txt", `✅ Bot started on server at ${new Date().toLocaleString()}\n`);
 const path = require("path");
 const qrcode = require("qrcode-terminal");
 const { Client, LocalAuth } = require("whatsapp-web.js");
