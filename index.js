@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const authPath = path.join(__dirname, ".wwebjs_auth");
-const lockFile = path.join(authPath, "session", "SingletonLock");
+const lockFile = path.join(authPath, "bot-session", "session", "SingletonLock"); // fixed for clientId
 
 console.log(`✅ Bot started on server at ${new Date().toLocaleString()}`);
 
@@ -45,10 +45,10 @@ app.listen(port, () => {
   }, 3000);
 });
 
-// Puppeteer setup
+// Puppeteer + Client setup
 const chromePath = process.env.CHROME_PATH || "/usr/bin/chromium";
 const client = new Client({
-  authStrategy: new LocalAuth(),
+  authStrategy: new LocalAuth({ clientId: "bot-session" }),
   puppeteer: {
     headless: true,
     executablePath: chromePath,
@@ -56,11 +56,11 @@ const client = new Client({
   },
 });
 
-// Group ID (replace with your actual group ID)
+// Group ID (replace with actual group ID)
 const targetGroupId = "917805064405-1614323596@g.us";
 const names = ["Nabhi-tiwariji", "Aman-Deep", "Abhilash"];
 
-// QR code
+// QR code login
 client.on("qr", (qr) => {
   console.log("📲 Scan the QR code below:");
   qrcode.generate(qr, { small: true });
@@ -71,13 +71,16 @@ client.on("ready", async () => {
   console.log("✅ WhatsApp bot is ready!");
 
   try {
-    await client.sendMessage(targetGroupId, "🔁 *AutoBot 2.0* ⚙️ restarted and is now active again! ~ Made by Arya");
+    await client.sendMessage(
+      targetGroupId,
+      "🔁 *AutoBot 2.0* ⚙️ restarted and is now active again! ~ Made by Arya"
+    );
     console.log("✅ Restart message sent to group.");
   } catch (err) {
     console.error("❌ Could not send restart notification:", err.message);
   }
 
-  // Veggie duty every Monday 5PM
+  // Weekly veggie duty (Monday 5PM)
   cron.schedule("0 17 * * 1", async () => {
     if (!isClientReady()) return;
     const now = new Date();
@@ -93,7 +96,7 @@ client.on("ready", async () => {
     }
   });
 
-  // Test message every 5 min
+  // Every 5 mins ping
   cron.schedule("*/5 * * * *", async () => {
     if (!isClientReady()) return;
     try {
@@ -104,14 +107,14 @@ client.on("ready", async () => {
   });
 });
 
-// Reply only in group
+// Message handling
 client.on("message", async (message) => {
   if (message.fromMe) return;
   if (message.from !== targetGroupId) return;
   await handleReplies(message);
 });
 
-// Handle disconnect
+// Disconnection recovery
 client.on("disconnected", (reason) => {
   console.error("❌ Client disconnected:", reason);
   setTimeout(() => {
@@ -120,7 +123,7 @@ client.on("disconnected", (reason) => {
   }, 5000);
 });
 
-// Safe shutdown
+// Graceful shutdown
 process.on("SIGINT", async () => {
   console.log("👋 Bot shutting down...");
   try {
@@ -131,7 +134,7 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-// Utility: check client ready
+// Utility: check if client ready
 function isClientReady() {
   return client && client.info && client.info.wid;
 }
