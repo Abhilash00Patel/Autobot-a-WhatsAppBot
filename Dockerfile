@@ -1,49 +1,30 @@
-FROM node:16
+# Dockerfile
 
-# Install Chromium dependencies and clean up after installation
-RUN apt-get update --fix-missing && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+FROM node:20-alpine
+
+# 1) Install headless Chromium and minimal runtime deps
+RUN apk add --no-cache \
     chromium \
-    fonts-liberation \
-    libappindicator3-1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdbus-1-3 \
-    libgdk-pixbuf2.0-0 \
-    libnspr4 \
-    libnss3 \
-    libx11-xcb1 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    xdg-utils \
-    libgbm-dev \
-    libxshmfence-dev \
-    --no-install-recommends && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
 
-# Set environment variable for Puppeteer to locate Chromium
-ENV CHROME_PATH=/usr/bin/chromium
+# 2) Tell Puppeteer to skip its own Chromium download
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+# 3) Point at the system Chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV CHROME_PATH=/usr/bin/chromium-browser
 
-# Optionally set the PORT to 3000 for consistency—
-# (Azure will override process.env.PORT if needed, and your code uses process.env.PORT || 3000)
-ENV PORT=3000
+WORKDIR /app
 
-# Set the working directory
-WORKDIR /home/site/wwwroot
-
-# Copy package files and install Node.js dependencies
+# 4) Copy package manifests and install deps (no dev)
 COPY package*.json ./
-RUN npm install
+RUN npm ci --omit=dev
 
-# Copy the rest of your application code
+# 5) Copy application code
 COPY . .
 
-# Expose the port your app will run on
 EXPOSE 3000
-
-# Start your app – using explicit relative path for safety
-CMD ["node", "./index.js"]
+CMD ["node", "index.js"]
