@@ -15,7 +15,7 @@ const port = process.env.PORT || 3000;
 app.get("/health", (req, res) => res.status(200).send("OK"));
 app.get("/", (req, res) => res.send("AutoBot 2.0 is alive! 🚀"));
 
-// --- Serve QR PNG endpoint ---
+// --- Serve QR PNG endpoint -
 let lastQr = null, lastTime = 0;
 const QR_THROTTLE_MS = 60_000;
 app.get("/qr.png", async (req, res) => {
