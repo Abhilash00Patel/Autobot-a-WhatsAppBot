@@ -78,17 +78,17 @@ const handleReplies = async (message) => {
       await message.reply(reply);
     }
     
-    if (text === "uv" || text == "Yuvi" || "yuvraj") {
+    if (text === "uv" || text == "Yuvi" || text == "yuvraj") {
       const reply = "Lambu 🕺, Adventurous 🌍, Explorer 🔎,Entrepreneur";
       await message.reply(reply);
     }
     
-    if (text === "pratham" || text == "bhau" || "prathvi") {
+    if (text == "pratham" || text == "bhau" || text == "prathvi") {
       const reply = "Emotional 🥹, Cultural 🚩, PatelSaab 😎, Entrepreneur";
       await message.reply(reply);
     }
     
-    if (text === "Manas") {
+    if (text == "Manas") {
       const reply = "Supportive 🤝, Chef 👨🏻‍🍳 , KindHearted 🩵 , Entrepreneur";
       await message.reply(reply);
     }
