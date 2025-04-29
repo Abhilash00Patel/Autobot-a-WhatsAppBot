@@ -54,7 +54,7 @@ const handleReplies = async (message) => {
     }
   
     if (text === "abhilash") {
-      const reply = "Genius, Billionaire, Entreprenur , Bramhchari + Creator ~ *Autobot* ⚙️";
+      const reply = "Genius, Billionaire, Entrepreneur , Bramhchari + Creator ~ *Autobot* ⚙️";
       await message.reply(reply);
     }
   
@@ -77,7 +77,22 @@ const handleReplies = async (message) => {
       const reply = "Good Hearted ❤️, heartbroken 💔, searching himself in this papi world 🔭";
       await message.reply(reply);
     }
-  
+    
+    if (text === "uv" || text == "Yuvi" || "yuvraj") {
+      const reply = "Lambu 🕺, Adventurous 🌍, Explorer 🔎,Entrepreneur";
+      await message.reply(reply);
+    }
+    
+    if (text === "pratham" || text == "bhau" || "prathvi") {
+      const reply = "Emotional 🥹, Cultural 🚩, PatelSaab 😎, Entrepreneur";
+      await message.reply(reply);
+    }
+    
+    if (text === "Manas") {
+      const reply = "Supportive 🤝, Chef 👨🏻‍🍳 , KindHearted 🩵 , Entrepreneur";
+      await message.reply(reply);
+    }
+    
     if (
       text === "who are you" ||
       text === "whoareyou" ||

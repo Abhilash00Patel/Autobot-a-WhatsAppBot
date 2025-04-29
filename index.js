@@ -95,7 +95,6 @@ client.on("ready", async () => {
   }
   setupCronJobs();
 });
-
 client.on("message", async (message) => {
   if (message.from === targetGroupId) {
     console.log(`Received message from target group: ${message.body.substring(0, 20)}...`);
