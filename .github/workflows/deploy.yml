@@ -10,38 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) checkout your repo
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2) Azure login (uses a Service Principal stored in AZURE_CREDENTIALS)
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 3) Login to your ACR
       - name: ACR Login
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ secrets.ACR_NAME }}.azurecr.io
+          login-server: whatsappacr.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
-      # 4) Build & push your container to ACR
-      - name: Build & Push Docker Image
+      - name: Build & Push Image
         uses: docker/build-push-action@v3
         with:
           context: .
           platforms: linux/amd64
           push: true
           tags: |
-            ${{ secrets.ACR_NAME }}.azurecr.io/abhilashpatel/whatsapp-bot:latest
-            ${{ secrets.ACR_NAME }}.azurecr.io/abhilashpatel/whatsapp-bot:${{ github.sha }}
+            whatsappacr.azurecr.io/abhilashpatel/whatsapp-bot:latest
+            whatsappacr.azurecr.io/abhilashpatel/whatsapp-bot:${{ github.sha }}
 
-      # 5) Deploy the “latest” tag to your Web App
-      - name: Deploy to Azure Web App (Container)
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ secrets.WEBAPP_NAME }}
+          app-name: whatsapp-bot-az
           slot-name: production
-          images: |
-            ${{ secrets.ACR_NAME }}.azurecr.io/abhilashpatel/whatsapp-bot:latest
+          images: whatsappacr.azurecr.io/abhilashpatel/whatsapp-bot:latest
